@@ -23,7 +23,7 @@ The source code originates from the **University of Cape Town (UCT)** Department
 
 ## Repository Structure
 
-uct-activated-sludge/ ├── .gitignore ├── README.md ├── legacy/ │ └── pascal/ # 58 Pascal source files (5,888 lines total) │ ├── UCTOLD.PAS # Main program entry point │ ├── VARSUNIT.PAS # Global variables and constants │ ├── STCHUNIT.PAS # Stoichiometry unit │ ├── KINUNIT.PAS # Kinetics unit │ ├── RATEUNIT.PAS # Rate calculations │ ├── INTEGRAT.PAS # Numerical integration (Dahlquist & Björck) │ ├── NEWTON.PAS # Newton-Raphson solver │ ├── ... (52 more files) │ └── WATER.PAS # Wastewater composition ├── docs/ │ ├── ASM1/ # ASM1 reference papers (PDFs, DOCX) │ └── UCT_Design_Manual/ # UCT design theory (Chapters 1-6) ├── src/ # Target: Modernized Python implementation └── converted/ # Target: Morph intermediate files
+uct-activated-sludge/ ├── .gitignore ├── README.md ├── legacy/ │ └── pascal/ # 58 Pascal source files (5,888 lines total) │ ├── ADJTEMP.PAS # Temperature adjustment routines │ ├── BACKGRND.PAS # Background graphics │ ├── BOXES.PAS # UI box drawing │ ├── CFGUNIT.PAS # Configuration unit │ ├── CHANGE.PAS # Parameter change routines │ ├── DATA.PAS # Data handling │ ├── DETECT.PAS # Hardware detection │ ├── DIDATA.PAS # Data I/O │ ├── DIDISK.PAS # Disk I/O │ ├── DIOUTS.PAS # Output routines │ ├── DIURNAL.PAS # Diurnal variation patterns │ ├── DRIVERS.PAS # Device drivers │ ├── DUMPPLOT.PAS # Plot dump routines │ ├── FILEIO.PAS # File I/O operations │ ├── FLOWDI.PAS # Flow diagram routines │ ├── FLOWSS.PAS # Flow calculations │ ├── FONTS.PAS # Font definitions │ ├── FORMAT.PAS # Formatting routines │ ├── FRACINF.PAS # Fraction information │ ├── FRONT.PAS # Front-end routines │ ├── GRAFPLOT.PAS # Graphics plotting │ ├── GRAFUNIT.PAS # Graphics unit │ ├── GROUT.PAS # Graphics output │ ├── INFUNIT.PAS # Information unit │ ├── INITUNIT.PAS # Initialization unit │ ├── INTEGRAT.PAS # Numerical integration │ ├── INTPARAM.PAS # Internal parameters │ ├── IOCHECK.PAS # I/O checking │ ├── IOUNIT.PAS # I/O unit │ ├── KINETIC.PAS # Kinetic parameters │ ├── KINUNIT.PAS # Kinetics unit │ ├── MACHEPS.PAS # Machine epsilon calculation │ ├── MENUIO.PAS # Menu I/O │ ├── MODWASTE.PAS # Waste modification │ ├── NEWTON.PAS # Newton-Raphson solver │ ├── OPUNIT.PAS # Operations unit │ ├── OUTPARAM.PAS # Output parameters │ ├── PAGEUP.PAS # Page update routines │ ├── PRINTER.PAS # Printer output │ ├── PRTUNIT.PAS # Print unit │ ├── RATEUNIT.PAS # Rate calculations unit │ ├── REDIRECT.PAS # Redirect routines │ ├── RETRIEVE.PAS # Data retrieval │ ├── SCALE.PAS # Scaling routines │ ├── SECOND.PAS # Timing routines │ ├── SETAVG.PAS # Set averages │ ├── SETFLG.PAS # Set flags │ ├── SETWASTE.PAS # Set waste parameters │ ├── STCHUNIT.PAS # Stoichiometry unit │ ├── STDYRSLT.PAS # Steady-state results │ ├── STDYUNIT.PAS # Steady-state unit │ ├── STRINGS.PAS # String utilities │ ├── UCTOLD.PAS # Main UCT program │ ├── VARSUNIT.PAS # Global variables unit │ └── WATER.PAS # Water properties ├── docs/ │ ├── ASM1/ # ASM1 reference papers (PDFs, DOCX) │ └── UCT_Design_Manual/ # UCT design theory (Chapters 1-6) ├── src/ # Target: Modernized Python implementation └── converted/ # Target: Morph intermediate files
 
 ## Legacy Pascal Source Analysis
 
@@ -33,21 +33,21 @@ uct-activated-sludge/ ├── .gitignore ├── README.md ├── legacy/
 
 #### Main Program Entry Point
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `UCTOLD.PAS` | — | Main program with compiler directives (`{$R-}`, `{$B+}`, `{$S+}`, `{$I+}`, `{$N-}`); no numeric coprocessor assumed |
+| File | Purpose |
+|------|---------|
+| `UCTOLD.PAS` | Main program with compiler directives (`{$R-}`, `{$B+}`, `{$S+}`, `{$I+}`, `{$N-}`); no numeric coprocessor assumed |
 
 #### Core Computational Modules
 
 | File | Declaration | Purpose |
 |------|-------------|---------|
-| `VARSUNIT.PAS` | `Unit VarsUnit` | Central global variables and constants — the shared state for all other units |
+| `VARSUNIT.PAS` | `Unit VarsUnit` | Central global variables and constants |
 | `STCHUNIT.PAS` | `Unit StchUnit` | Stoichiometric matrix and coefficients (ASM1) |
 | `KINUNIT.PAS` | `Unit KinUnit` | Kinetic parameters and rate expressions |
 | `RATEUNIT.PAS` | `Unit RateUnit` | Rate calculation routines |
-| `INTEGRAT.PAS` | `Procedure Integrate` | Numerical integration (Dahlquist & Björck method; last edited 18/2/88 by PLD) |
+| `INTEGRAT.PAS` | `Procedure Integrate` | Numerical integration (Dahlquist & Björck method) |
 | `NEWTON.PAS` | `Procedure Newton` | Newton-Raphson solver for system of equations |
-| `MACHEPS.PAS` | `Procedure CalcMachEps` | Machine epsilon calculation for numerical precision |
+| `MACHEPS.MAS` | `Procedure CalcMachEps` | Machine epsilon calculation for numerical precision |
 | `ADJTEMP.PAS` | `Procedure TempAdjustment` | Temperature correction (Arrhenius); includes custom `Power(B,X)` function |
 | `SCALE.PAS` | `Procedure ScaleValues` | Matrix scaling for numerical stability |
 | `FRACINF.PAS` | `Procedure FractionateInfluent` | Influent COD fractionation into ASM1 components |
@@ -88,10 +88,10 @@ uct-activated-sludge/ ├── .gitignore ├── README.md ├── legacy/
 
 | File | Declaration | Purpose |
 |------|-------------|---------|
-| `KINETIC.PAS` | `Procedure Heterotrophs` | Heterotroph kinetic constants (μ̂, Ks, etc.) |
+| `KINETIC.PAS` | `Procedure Heterotrophs` | Heterotroph kinetic constants (mu, Ks, etc.) |
 | `WATER.PAS` | `Procedure WasteWaterUpdate` | Wastewater composition parameters |
 | `CHANGE.PAS` | `Procedure ChangeParameter` | Interactive parameter modification |
-| `INTPARAM.PAS` | `Procedure CheckIntegParameters` | Integration accuracy and θ parameters |
+| `INTPARAM.PAS` | `Procedure CheckIntegParameters` | Integration accuracy and theta parameters |
 | `CFGUNIT.PAS` | `Unit CfgUnit` | Configuration management |
 | `INFUNIT.PAS` | `Unit InfUnit` | Information unit |
 | `OPUNIT.PAS` | `Unit OpUnit` | Operations unit |
@@ -124,8 +124,8 @@ uct-activated-sludge/ ├── .gitignore ├── README.md ├── legacy/
 | `BACKGRND.PAS` | `Procedure ReverseVideo` | Screen colour/video management |
 | `BOXES.PAS` | `Procedure InputBox` | Input dialog boxes |
 | `DETECT.PAS` | `Procedure DetectScreen` | BGI driver registration (CGA, EGA/VGA) |
-| `DRIVERS.PAS` | `Unit Drivers` | BGI graphics drivers (Borland, ©1985/87) |
-| `FONTS.PAS` | `Unit Fonts` | BGI font linking (Borland, ©1985/87) |
+| `DRIVERS.PAS` | `Unit Drivers` | BGI graphics drivers (Borland) |
+| `FONTS.PAS` | `Unit Fonts` | BGI font linking (Borland) |
 | `FORMAT.PAS` | `Procedure Msg` | Screen message formatting |
 | `FRONT.PAS` | `Procedure FrontPage` | Title/front page screen |
 | `SECOND.PAS` | `Procedure SecondPage` | Second information screen |
@@ -141,7 +141,7 @@ uct-activated-sludge/ ├── .gitignore ├── README.md ├── legacy/
 
 3. **Two standalone programs:** `RETRIEVE.PAS` and `PAGEUP.PAS` are standalone `Program` files, not included by the main program.
 
-4. **Borland-provided files:** `DRIVERS.PAS` and `FONTS.PAS` are Borland sample units (©1985/87) for BGI graphics linking — these can be excluded from conversion.
+4. **Borland-provided files:** `DRIVERS.PAS` and `FONTS.PAS` are Borland sample units for BGI graphics linking — these can be excluded from conversion.
 
 5. **Numerical methods:** The integration routine references Dahlquist & Björck (numerical methods textbook), suggesting a Runge-Kutta or similar ODE solver. The `Newton` procedure handles nonlinear system solving.
 
@@ -170,4 +170,10 @@ Approximately **12–15 files** are pure UI/graphics with no computational value
 
 ### Proposed Python Module Mapping
 
-src/uct_activated_sludge/ ├── init.py # Package exports ├── models.py # Dataclasses replacing VarsUnit globals ├── constants.py # ASM1 stoichiometric/kinetic constants ├── stoichiometry.py ← StchUnit.PAS ├── kinetics.py ← KinUnit.PAS, KINETIC.PAS, RATEUNIT.PAS ├── influent.py ← FRACINF.PAS, WATER.PAS ├── hydraulics.py ← FLOWDI.PAS, FLOWSS.PAS, WASTE.PAS, SETWASTE.PAS ├── solver.py ← NEWTON.PAS, MACHEPS.PAS ├── integrator.py ← INTEGRAT.PAS, INTPARAM.PAS ├── temperature.py ← ADJTEMP.PAS ├── steady_state.py ← STDYUNIT.PAS, STDYRSLT.PAS, SETAVG.PAS, SETFLG.PAS ├── diurnal.py ← DIURNAL.PAS, DIDATA.PAS, DIOUTS.PAS, DIRSLTS.PAS ├── io/ ← FILEIO.PAS, IOCHECK.PAS, IOUNIT.PAS, DIDISK.PAS │ ├── init.py │ ├── file_io.py │ └── validation.py ├── output/ ← PRINTER.PAS, PRTUNIT.PAS, OUTPARAM.PAS │ ├── init.py │ └── reports.py └── cli.py # New: replaces all UI/menu procedures
+src/uct_activated_sludge/ ├── init.py # Package exports ├── models.py # Dataclasses replacing VarsUnit globals ├── constants.py # ASM1 stoichiometric/kinetic constants ├── stoichiometry.py <- StchUnit.PAS ├── kinetics.py <- KinUnit.PAS, KINETIC.PAS, RATEUNIT.PAS ├── influent.py <- FRACINF.PAS, WATER.PAS ├── hydraulics.py <- FLOWDI.PAS, FLOWSS.PAS, WASTE.PAS, SETWASTE.PAS ├── solver.py <- NEWTON.PAS, MACHEPS.PAS ├── integrator.py <- INTEGRAT.PAS, INTPARAM.PAS ├── temperature.py <- ADJTEMP.PAS ├── steady_state.py <- STDYUNIT.PAS, STDYRSLT.PAS, SETAVG.PAS, SETFLG.PAS ├── diurnal.py <- DIURNAL.PAS, DIDATA.PAS, DIOUTS.PAS, DIRSLTS.PAS ├── io/ <- FILEIO.PAS, IOCHECK.PAS, IOUNIT.PAS, DIDISK.PAS │ ├── init.py │ ├── file_io.py │ └── validation.py ├── output/ <- PRINTER.PAS, PRTUNIT.PAS, OUTPARAM.PAS │ ├── init.py │ └── reports.py └── cli.py # New: replaces all UI/menu procedures
+
+## Acknowledgement
+
+Original UCT Activated Sludge Model code developed by Prof. George Ekama and colleagues at UCT.
+Available for educational and research purposes.
+EOF
