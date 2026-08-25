@@ -1,0 +1,125 @@
+# UCT Activated Sludge Model -- Default Configuration
+# All values shown are the defaults from the Pascal original (KINUNIT.PAS,
+# STCHUNIT.PAS, WATER.PAS, DIUNIT.PAS).
+#
+# This file is optional: any key omitted here will use the dataclass
+# default from models.py.
+
+# ===================================================================
+# Kinetic rate constants
+# ===================================================================
+[kinetics]
+
+  # -- Heterotrophic parameters at 20 degC reference temperature --
+  [kinetics.heterotrophs]
+  MuHatHetero20 = 3.2       # Maximum specific growth rate (d^-1)
+  Ks20          = 5.0        # Half-saturation coefficient for Ss (g COD m^-3)
+  Bh20          = 0.62       # Endogenous respiration rate (d^-1)
+  Koh           = 0.002      # Half-saturation coefficient for DO (g O2 m^-3)
+  NetaGrow      = 0.33       # Anoxic growth reduction factor (-)
+  Kno           = 0.10       # Half-saturation coefficient for NO3 (g N m^-3)
+  Kmp20         = 1.35       # Maximum specific rate for Xp hydrolysis (d^-1)
+  Ksp20         = 0.027      # Half-saturation for Xp hydrolysis (g COD / g COD)
+  Kr20          = 0.032      # Adsorption rate constant (d^-1)
+  Kna           = 0.01       # Half-saturation coefficient for NH3 (g N m^-3)
+  Ka20          = 0.17       # Ammonification rate constant (m^3 g^-1 COD d^-1)
+
+  # -- Autotrophic (nitrifier) parameters at 20 degC --
+  [kinetics.autotrophs]
+  MuHatAuto20 = 0.45         # Maximum specific growth rate (d^-1)
+  Knh20       = 1.0          # Half-saturation for NH3 (g N m^-3)
+  Koa         = 0.002        # Half-saturation for DO (g O2 m^-3)
+  Ba20        = 0.04         # Endogenous respiration rate (d^-1)
+
+  # -- Arrhenius theta temperature-correction factors --
+  [kinetics.arrhenius]
+  ThetaMuHatH = 1.200        # Theta for MuHatHetero
+  ThetaKs     = 1.000        # Theta for Ks (no temperature effect)
+  ThetaBh     = 1.029        # Theta for Bh
+  ThetaKmp    = 1.08         # Theta for Kmp
+  ThetaKsp    = 0.910        # Theta for Ksp
+  ThetaKr     = 1.029        # Theta for Kr
+  ThetaKa     = 1.029        # Theta for Ka
+  ThetaMuHatA = 1.123        # Theta for MuHatAuto
+  ThetaKnh    = 1.123        # Theta for Knh
+  ThetaBa     = 1.029        # Theta for Ba
+
+
+# ===================================================================
+# Stoichiometric / yield coefficients
+# ===================================================================
+[stoichiometry]
+Yh     = 0.666               # Heterotrophic yield (g COD / g COD) = 0.45 * 1.48
+Fe     = 0.08                # Endogenous residue fraction (-)
+Ixb    = 0.0676              # N content of biomass (g N / g COD) ~ 0.1 / 1.48
+Ixe    = 0.0676              # N content of endogenous residue (g N / g COD) ~ 0.1 / 1.48
+Ya     = 0.15                # Autotrophic yield (g COD / g N)
+CODVSS = 1.48                # COD-to-VSS ratio (g COD / g VSS)
+Fma    = 1.00                # Maximum aerobic fraction (-)
+
+
+# ===================================================================
+# Wastewater fractionation (Raw sewage defaults from WATER.PAS)
+# ===================================================================
+[wastewater]
+Sti    = 500.0               # Total influent COD (g COD m^-3)
+Nti    = 50.0                # Total influent TKN (g N m^-3)
+Fbs    = 0.20                # Readily biodegradable fraction of Sbi (-)
+Fus    = 0.05                # Unbiodegradable soluble fraction of Sti (-)
+Fup    = 0.13                # Unbiodegradable particulate fraction of Sti (-)
+Fnaa   = 0.75                # Free-and-saline ammonia fraction of OrgN (-)
+Fnox   = 0.50                # Biodegradable fraction of organic N (-)
+Fnu    = 0.03                # Unbiodegradable fraction of soluble OrgN (-)
+Fxbh   = 0.0                 # Influent active heterotroph fraction (-)
+VSSTSS = 0.75                # VSS-to-TSS ratio (g VSS / g TSS)
+Alki   = 10.0                # Influent alkalinity (meq/L as CaCO3)
+settled = false              # Whether settled-sewage fractionation is active
+
+
+# ===================================================================
+# Plant configuration (reactor topology and operating parameters)
+# ===================================================================
+[plant]
+LastReactor = 3               # Number of active reactors (1..12)
+Temp        = 20.0            # Operating temperature (degC)
+Rs          = 20.0            # Sludge retention time / SRT (days)
+VolType     = "ML"            # Volume unit label (must be "ML")
+
+# Reactor volumes (1-based: reactor 1, reactor 2, ... up to MaxReac=12)
+Vol = [1.5, 3.0, 6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+# Fractional feed distribution to each reactor
+FracFeed = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+# Dissolved oxygen setpoint per reactor (g O2 m^-3)
+DOConc = [0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+# Aeration flags per reactor (true = aerated)
+ReactorAerated = [false, false, true, true, true, true, true, true, true, true, true, true, true]
+
+# Recycle source/destination reactor numbers
+ReactorAIn  = 2
+ReactorAOut = 3
+ReactorBIn  = 0
+ReactorBOut = 0
+
+# Flow parameters (ML/d)
+FlowFeed       = 25.0
+FlowRASrecycle = 25.0
+FlowArecycle   = 75.0
+FlowBrecycle   = 0.0
+FlowWaste      = 0.0
+
+# Recycle routing flags (1-based: 1 = connected to that reactor)
+FlagRASIn = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+FlagAIn   = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+FlagAOut  = [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+
+# ===================================================================
+# Numerical integration control (from DIUNIT.PAS)
+# ===================================================================
+[integration]
+Accuracy     = 0.50           # Relative error tolerance (fraction)
+Theta        = 0.70           # Implicit/explicit weighting (0=explicit, 1=fully implicit)
+DataIntHours = 0.25           # Data interpolation interval (hours; 0.25 = 15 min)
