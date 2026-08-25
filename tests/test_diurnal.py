@@ -84,3 +84,135 @@ class TestRunDiurnalImport:
         """modify_waste should be importable."""
         from uct_activated_sludge.diurnal import modify_waste
         assert callable(modify_waste)
+
+
+class TestRunDiurnalExecution:
+    """Integration tests that actually call run_diurnal with a real config."""
+
+    @pytest.fixture
+    def steady_state_result(self):
+        """Run a steady-state solve to get initial conditions for diurnal."""
+        from uct_activated_sludge.steady_state import run_steady_state
+        from uct_activated_sludge.models import (
+            KineticParams,
+            PlantConfig,
+            StoichiometricParams,
+            WastewaterParams,
+        )
+
+        pc = PlantConfig()
+        pc.LastReactor = 3
+        pc.Vol[1] = 1.5
+        pc.Vol[2] = 3.0
+        pc.Vol[3] = 6.0
+        pc.FracFeed[1] = 1.0
+        pc.DOConc[1] = 0.0
+        pc.DOConc[2] = 0.0
+        pc.DOConc[3] = 2.0
+        pc.ReactorAerated[1] = False
+        pc.ReactorAerated[2] = False
+        pc.ReactorAerated[3] = True
+        pc.FlowFeed = 25.0
+        pc.FlowRASrecycle = 25.0
+        pc.FlowArecycle = 75.0
+        pc.FlowBrecycle = 0.0
+        pc.FlagRASIn[1] = 1
+        pc.FlagAIn[2] = 1
+        pc.FlagAOut[3] = 1
+        pc.ReactorAIn = 2
+        pc.ReactorAOut = 3
+        pc.Rs = 20.0
+        pc.Temp = 20.0
+        pc.VolumeTotal = 10.5
+
+        return run_steady_state(pc, KineticParams(), StoichiometricParams(), WastewaterParams())
+
+    def test_run_diurnal_with_default_data(self, steady_state_result):
+        """run_diurnal should complete and return expected keys."""
+        from uct_activated_sludge.models import (
+            IntegrationParams,
+            KineticParams,
+            StoichiometricParams,
+            WastewaterParams,
+        )
+
+        ss = steady_state_result
+        diurnal_data = default_diurnal_data(flow=25.0, cod=500.0, tkn=50.0)
+
+        result = run_diurnal(
+            plant_config=ss["plant_config"],
+            kinetic_params=ss["kinetic_params"],
+            stoich_params=StoichiometricParams(),
+            ww_params=WastewaterParams(),
+            integration_params=IntegrationParams(),
+            C_steady=ss["CSteady"],
+            diurnal_data=diurnal_data,
+            stoich_matrix=ss["Stoich"],
+            max_cycles=5,
+        )
+
+        # Verify expected keys
+        expected_keys = {
+            "response", "cycle_count", "converged",
+            "C_final", "data_per_day", "data_int_hours",
+        }
+        assert expected_keys == set(result.keys())
+
+    def test_run_diurnal_cycle_count_positive(self, steady_state_result):
+        """run_diurnal should execute at least one cycle."""
+        from uct_activated_sludge.models import (
+            IntegrationParams,
+            StoichiometricParams,
+            WastewaterParams,
+        )
+
+        ss = steady_state_result
+        diurnal_data = default_diurnal_data(flow=25.0, cod=500.0, tkn=50.0)
+
+        result = run_diurnal(
+            plant_config=ss["plant_config"],
+            kinetic_params=ss["kinetic_params"],
+            stoich_params=StoichiometricParams(),
+            ww_params=WastewaterParams(),
+            integration_params=IntegrationParams(),
+            C_steady=ss["CSteady"],
+            diurnal_data=diurnal_data,
+            stoich_matrix=ss["Stoich"],
+            max_cycles=5,
+        )
+
+        assert result["cycle_count"] >= 1
+
+    def test_run_diurnal_concentrations_non_negative(self, steady_state_result):
+        """Final concentrations should be finite and non-negative."""
+        from uct_activated_sludge.models import (
+            IntegrationParams,
+            StoichiometricParams,
+            WastewaterParams,
+        )
+
+        ss = steady_state_result
+        diurnal_data = default_diurnal_data(flow=25.0, cod=500.0, tkn=50.0)
+
+        result = run_diurnal(
+            plant_config=ss["plant_config"],
+            kinetic_params=ss["kinetic_params"],
+            stoich_params=StoichiometricParams(),
+            ww_params=WastewaterParams(),
+            integration_params=IntegrationParams(),
+            C_steady=ss["CSteady"],
+            diurnal_data=diurnal_data,
+            stoich_matrix=ss["Stoich"],
+            max_cycles=3,
+        )
+
+        C_final = result["C_final"]
+        last_reactor = ss["plant_config"].LastReactor
+        for k in range(1, last_reactor + 1):
+            for i in range(1, 14):
+                assert np.isfinite(C_final[k, i]), (
+                    f"C_final[{k},{i}] is not finite: {C_final[k, i]}"
+                )
+                assert C_final[k, i] >= 0.0, (
+                    f"C_final[{k},{i}] is negative: {C_final[k, i]}"
+                )

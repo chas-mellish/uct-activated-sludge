@@ -5,7 +5,7 @@ import pytest
 
 from uct_activated_sludge.constants import MAX_N, MAX_REAC_P1, TOTAL_COMPOUNDS
 from uct_activated_sludge.models import PlantConfig, _zeros_2d_1based
-from uct_activated_sludge.solver import gauss, scale_values
+from uct_activated_sludge.solver import gauss, newton, scale_values
 
 
 class TestGauss:
@@ -153,3 +153,78 @@ class TestScaleValues:
             for i in range(1, 14):
                 idx = 13 * (k - 1) + i
                 assert scale[idx] != 0.0
+
+
+class TestNewton:
+    """Tests for the newton() solver directly."""
+
+    def test_tracer_mode_converges(self):
+        """Newton in tracer mode (compounds=1) should converge on a simple config."""
+        from uct_activated_sludge.models import (
+            KineticParams,
+            StoichiometricParams,
+        )
+        from uct_activated_sludge.stoichiometry import build_stoichiometric_matrix
+        from uct_activated_sludge.kinetics import air_supply
+        from uct_activated_sludge.hydraulics import flow_division_ss_inplace
+
+        pc = PlantConfig()
+        pc.LastReactor = 3
+        pc.Vol[1] = 1.5
+        pc.Vol[2] = 3.0
+        pc.Vol[3] = 6.0
+        pc.FracFeed[1] = 1.0
+        pc.DOConc[1] = 0.0
+        pc.DOConc[2] = 0.0
+        pc.DOConc[3] = 2.0
+        pc.ReactorAerated[1] = False
+        pc.ReactorAerated[2] = False
+        pc.ReactorAerated[3] = True
+        pc.FlowFeed = 25.0
+        pc.FlowRASrecycle = 25.0
+        pc.FlowArecycle = 75.0
+        pc.FlowBrecycle = 0.0
+        pc.FlagRASIn[1] = 1
+        pc.FlagAIn[2] = 1
+        pc.FlagAOut[3] = 1
+        pc.ReactorAIn = 2
+        pc.ReactorAOut = 3
+        pc.Rs = 20.0
+        pc.Temp = 20.0
+        pc.VolumeTotal = 10.5
+        pc.FlowWaste = pc.VolumeTotal / pc.Rs
+
+        # Set up steady-state flows
+        flow_division_ss_inplace(pc)
+
+        kp = KineticParams()
+        sp = StoichiometricParams()
+        stoich = build_stoichiometric_matrix(sp)
+
+        air_on_h, air_off_h, air_on_a, air_off_a = air_supply(pc, kp)
+
+        # Seed tracer concentrations (compound 1)
+        C = _zeros_2d_1based(MAX_REAC_P1, TOTAL_COMPOUNDS)
+        tracer_conc_in = 100.0
+        for k in range(1, pc.LastReactor + 1):
+            C[k, 1] = pc.FlowFeed * tracer_conc_in * pc.Rs / pc.VolumeTotal
+        C[pc.LastReactor + 1, 1] = (
+            (pc.FlowFeed + pc.FlowRASrecycle - pc.FlowWaste)
+            / pc.FlowRASrecycle
+            * C[pc.LastReactor, 1]
+        )
+
+        C0 = np.zeros(TOTAL_COMPOUNDS + 1, dtype=np.float64)
+
+        C_result, converged = newton(
+            C, 1, pc, kp, sp, stoich, C0,
+            air_on_h, air_off_h, air_on_a, air_off_a,
+            TracerConcIn=tracer_conc_in,
+        )
+
+        assert converged is True
+
+        # Tracer concentrations should be positive and finite
+        for k in range(1, pc.LastReactor + 2):
+            assert np.isfinite(C_result[k, 1])
+            assert C_result[k, 1] > 0.0
