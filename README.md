@@ -15,4 +15,12 @@ Originally written in Pascal for 5-point titration calculations.
 Currently being converted using Morph for modern compilation.
 
 ## License
-[Add your license here]
+## Acknowledgement
+
+This project contains legacy Pascal code and reference documentation originating from the University of Cape Town (UCT), 
+originally developed by Professors G vR Marais, George Ekama, Richard E Lowenthal and colleagues.
+
+The original materials are provided for educational and research purposes. 
+Please acknowledge UCT and Prof. Ekama's contributions when using this code.
+
+For questions about licensing or commercial use, contact the UCT Department of Civil Engineering.
