@@ -12,24 +12,21 @@ from dataclasses import dataclass, field
 import numpy as np
 import numpy.typing as npt
 
-# ---------------------------------------------------------------------------
-# Constants mirrored from VARSUNIT.PAS
-# ---------------------------------------------------------------------------
-
-FIRST_SLOW: int = 1
-LAST_SLOW: int = 7
-FIRST_RAPID: int = 8
-LAST_RAPID: int = 13
-NO_PART: int = 7
-TOTAL_COMPOUNDS: int = 14  # including DO
-LAST_COMPOUND: int = 13
-NO_PROCESSES: int = 14
-NO_DI_VARS: int = 18
-
-MAX_REAC: int = 12
-MAX_REAC_P1: int = 13  # MaxReac + 1
-MAX_N: int = 169  # LastCompound * (MaxReac + 1)
-NO_DIURNAL_INTS: int = 12
+from uct_activated_sludge.constants import (
+    FIRST_SLOW,
+    LAST_SLOW,
+    FIRST_RAPID,
+    LAST_RAPID,
+    NO_PART,
+    TOTAL_COMPOUNDS,
+    LAST_COMPOUND,
+    NO_PROCESSES,
+    NO_DI_VARS,
+    MAX_REAC,
+    MAX_REAC_P1,
+    MAX_N,
+    NO_DIURNAL_INTS,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -191,13 +188,7 @@ class WastewaterParams:
     @classmethod
     def raw(cls, **kwargs: float) -> WastewaterParams:
         """Factory for Raw sewage fractionation (WATER.PAS ``Raw``)."""
-        defaults = dict(
-            Fbs=0.20, Fus=0.05, Fup=0.13,
-            Fnaa=0.75, Fnox=0.50, Fnu=0.03,
-            Fxbh=0.0, VSSTSS=0.75, settled=False,
-        )
-        defaults.update(kwargs)
-        return cls(**defaults)
+        return cls(**kwargs)
 
     @classmethod
     def settled_sewage(cls, **kwargs: float) -> WastewaterParams:
@@ -300,7 +291,7 @@ class PlantConfig:
     VolumeUnaerated: float = 0.0
     CumVol: float = 0.0
 
-    # Volume unit label (e.g. "ML", "m3")
+    # Volume unit label (must be "ML")
     VolType: str = "ML"
 
     # Configuration status flags

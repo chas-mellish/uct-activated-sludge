@@ -1,6 +1,5 @@
 """Shared fixtures for the UCT Activated Sludge Model test suite."""
 
-import numpy as np
 import pytest
 
 from uct_activated_sludge.models import (
@@ -8,7 +7,6 @@ from uct_activated_sludge.models import (
     PlantConfig,
     StoichiometricParams,
     WastewaterParams,
-    IntegrationParams,
 )
 from uct_activated_sludge.stoichiometry import build_stoichiometric_matrix
 

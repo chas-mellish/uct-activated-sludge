@@ -1,7 +1,6 @@
 """Tests for the Newton-Raphson solver with Gauss elimination."""
 
 import numpy as np
-import pytest
 
 from uct_activated_sludge.constants import MAX_N, MAX_REAC_P1, TOTAL_COMPOUNDS
 from uct_activated_sludge.models import PlantConfig, _zeros_2d_1based

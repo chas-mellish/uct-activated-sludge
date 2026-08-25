@@ -11,7 +11,7 @@ third-party ``tomli`` package for Python 3.10 compatibility.
 from __future__ import annotations
 
 import csv
-import os
+import dataclasses
 from pathlib import Path
 from typing import Any
 
@@ -31,7 +31,6 @@ from uct_activated_sludge.models import (
     PlantConfig,
     StoichiometricParams,
     WastewaterParams,
-    _false_1based,
     _zeros_1based,
 )
 
@@ -194,6 +193,9 @@ def _build_plant_config(section: dict[str, Any]) -> PlantConfig:
             elif isinstance(current, str):
                 setattr(pc, key, str(value))
 
+    if pc.VolumeTotal == 0.0 and pc.LastReactor > 0:
+        pc.VolumeTotal = float(np.sum(pc.Vol[1:pc.LastReactor + 1]))
+
     return pc
 
 
@@ -231,17 +233,19 @@ def build_params_from_config(
 
     # -- StoichiometricParams --
     stoich_section = config.get("stoichiometry", {})
+    stoich_fields = {f.name for f in dataclasses.fields(StoichiometricParams)}
     stoich_kwargs = {
         k: v for k, v in stoich_section.items()
-        if hasattr(StoichiometricParams, k) and not isinstance(v, dict)
+        if k in stoich_fields and not isinstance(v, dict)
     }
     sp = StoichiometricParams(**stoich_kwargs)
 
     # -- WastewaterParams --
     ww_section = config.get("wastewater", {})
+    ww_fields = {f.name for f in dataclasses.fields(WastewaterParams)}
     ww_kwargs = {
         k: v for k, v in ww_section.items()
-        if hasattr(WastewaterParams, k) and not isinstance(v, dict)
+        if k in ww_fields and not isinstance(v, dict)
     }
     wp = WastewaterParams(**ww_kwargs)
 
@@ -251,9 +255,10 @@ def build_params_from_config(
 
     # -- IntegrationParams --
     integ_section = config.get("integration", {})
+    integ_fields = {f.name for f in dataclasses.fields(IntegrationParams)}
     integ_kwargs = {
         k: v for k, v in integ_section.items()
-        if hasattr(IntegrationParams, k) and not isinstance(v, dict)
+        if k in integ_fields and not isinstance(v, dict)
     }
     ip = IntegrationParams(**integ_kwargs)
 

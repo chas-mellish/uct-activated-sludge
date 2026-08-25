@@ -171,21 +171,13 @@ def _run_diurnal_cmd(args: argparse.Namespace) -> int:
 
         # Write JSON output if requested
         if args.output is not None:
-            # Convert response arrays for JSON serialization
-            response_serializable = []
-            for item in di_result["response"]:
-                if item is None:
-                    response_serializable.append(None)
-                else:
-                    response_serializable.append(item)
-
             json_result = {
                 "cycle_count": di_result["cycle_count"],
                 "converged": di_result["converged"],
                 "data_per_day": di_result["data_per_day"],
                 "data_int_hours": di_result["data_int_hours"],
                 "C_final": di_result["C_final"],
-                "response": response_serializable,
+                "response": di_result["response"],
             }
             with open(args.output, "w") as f:
                 json.dump(json_result, f, cls=_NumpyEncoder, indent=2)

@@ -8,8 +8,6 @@ These tests verify invariants that must hold for arbitrary valid inputs:
 
 from __future__ import annotations
 
-import numpy as np
-import pytest
 from hypothesis import given, settings, assume
 from hypothesis import strategies as st
 

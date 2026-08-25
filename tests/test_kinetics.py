@@ -1,7 +1,6 @@
 """Tests for the ASM1 kinetic rate expressions, air supply, and utilization rates."""
 
 import numpy as np
-import pytest
 
 from uct_activated_sludge.constants import (
     MAX_REAC_P1,

@@ -17,7 +17,6 @@ and utilization-rate computation.
 from __future__ import annotations
 
 import math
-from functools import partial
 
 import numpy as np
 import numpy.typing as npt
@@ -452,10 +451,6 @@ def run_steady_state(
             "PlantConfig.FlowRASrecycle must be > 0. "
             f"Got {plant_config.FlowRASrecycle}."
         )
-
-    # Copy stoich_params VSSTSS from ww_params if not set
-    if stoich_params.VSSTSS == 0.0:
-        stoich_params.VSSTSS = ww_params.VSSTSS
 
     # ---- Step 1: Build stoichiometric matrix ----
     Stoich = build_stoichiometric_matrix(stoich_params)

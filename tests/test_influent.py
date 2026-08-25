@@ -1,7 +1,6 @@
 """Tests for the influent wastewater fractionation module."""
 
 import numpy as np
-import pytest
 
 from uct_activated_sludge.constants import ASM1Component as Comp, TOTAL_COMPOUNDS
 from uct_activated_sludge.influent import (

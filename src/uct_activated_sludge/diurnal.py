@@ -67,7 +67,7 @@ class DiurnalData:
         Time of day in hours (0, 2, 4, ..., 22).
     Flow : float
         Influent flow rate during this interval (same units as PlantConfig
-        flow fields, e.g. ML/d or m3/d).
+        flow fields, e.g. ML/d).
     COD : float
         Influent total COD during this interval (g COD m-3).
     TKN : float
@@ -453,7 +453,7 @@ def run_diurnal(
         )
 
         # Compute initial utilization rates and store response at data_no=0
-        Oc, On, Ot, Denit = utilization_rates(
+        Oc, On, Ot, _ = utilization_rates(
             C, stoich_matrix, plant_config, kinetic_params, stoich_params,
             air_on_h, air_off_h, air_on_a, air_off_a,
         )
@@ -529,7 +529,7 @@ def run_diurnal(
                 )
 
                 # Compute utilization rates after integration
-                Oc, On, Ot, Denit = utilization_rates(
+                Oc, On, Ot, _ = utilization_rates(
                     C, stoich_matrix, plant_config, kinetic_params,
                     stoich_params,
                     air_on_h, air_off_h, air_on_a, air_off_a,

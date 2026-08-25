@@ -1,8 +1,6 @@
 """Tests for the ASM1 stoichiometric matrix construction."""
 
 import numpy as np
-import numpy.typing as npt
-import pytest
 
 from uct_activated_sludge.constants import NO_PROCESSES, TOTAL_COMPOUNDS
 from uct_activated_sludge.models import StoichiometricParams

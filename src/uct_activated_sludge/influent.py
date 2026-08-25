@@ -117,9 +117,8 @@ def fractionate_influent(
     OrgN = (1.0 - Fnaa - Fnu) * Nti - Ixe * Fup * Sti - Ixb * Fxbh * Sti
 
     if OrgN < 0:
-        # Adjust Fnaa upward so OrgN becomes exactly zero
-        # (matches Pascal: Fnaa := (Nti - Fnu*Nti - Ixe*Fup*Sti - Ixb*Fxbh*Sti)/Nti)
-        Fnaa = (Nti - Fnu * Nti - Ixe * Fup * Sti - Ixb * Fxbh * Sti) / Nti
+        if Nti > 0:
+            Fnaa = (Nti - Fnu * Nti - Ixe * Fup * Sti - Ixb * Fxbh * Sti) / Nti
         OrgN = 0.0
 
     # C0[7] = Xnd: particulate biodegradable organic N

@@ -28,11 +28,9 @@ from uct_activated_sludge.constants import (
     LAST_SLOW,
     FIRST_RAPID,
     LAST_RAPID,
-    LAST_COMPOUND,
     NO_PROCESSES,
     TOTAL_COMPOUNDS,
     MAX_REAC_P1,
-    NO_PART,
 )
 from uct_activated_sludge.kinetics import process_rates
 from uct_activated_sludge.models import (
@@ -79,7 +77,7 @@ def _compute_epsilon(
     Epsilon = np.zeros(TOTAL_COMPOUNDS + 1, dtype=np.float64)
     for i in range(FIRST_SLOW, LAST_RAPID + 1):
         if C[1, i] != 0.0:
-            Epsilon[i] = C[1, i] * accuracy / 100.0
+            Epsilon[i] = abs(C[1, i]) * accuracy / 100.0
         else:
             Epsilon[i] = 1.0e06
     # Floor at 1e-06 to avoid division issues

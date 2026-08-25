@@ -18,7 +18,6 @@ from uct_activated_sludge.constants import (
     ASM1Component as Comp,
     ASM1Process as Proc,
     NO_PROCESSES,
-    TOTAL_COMPOUNDS,
 )
 from uct_activated_sludge.models import (
     KineticParams,

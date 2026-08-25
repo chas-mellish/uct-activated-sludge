@@ -65,7 +65,7 @@ def flow_division_ss(
     last_reactor : int
         Number of active reactors (1-based).
     flow_feed, flow_ras_recycle, flow_a_recycle, flow_b_recycle, flow_waste : float
-        Volumetric flow rates (consistent units, e.g. m3/d).
+        Volumetric flow rates (consistent units, e.g. ML/d).
     frac_feed : ndarray, shape (MAX_REAC_P1+1,)
         Feed-fraction to each reactor (1-based).
     flag_ras_in, flag_a_in, flag_b_in : ndarray
@@ -210,7 +210,7 @@ def flow_division_dynamic(
     # DhRAS is compound-dependent: particulate compounds use a different
     # flow (underflow) than soluble compounds (RAS recycle flow).
     # Shape: [0..MAX_REAC_P1, 0..TOTAL_COMPOUNDS]  (1-based on both axes)
-    dh_ras = np.zeros((MAX_REAC_P1 + 1, TOTAL_COMPOUNDS), dtype=np.float64)
+    dh_ras = np.zeros((MAX_REAC_P1 + 1, TOTAL_COMPOUNDS + 1), dtype=np.float64)
 
     flow_from_previous[1] = 0.0
 
@@ -323,11 +323,14 @@ def _seed_waste(
         tracer[k] = flow_feed * tracer_conc_in * rs / volume_total
 
     # Settling-tank pseudo-reactor
-    tracer[last_reactor + 1] = (
-        (flow_feed + flow_ras_recycle - flow_waste)
-        / flow_ras_recycle
-        * tracer[last_reactor]
-    )
+    if flow_ras_recycle == 0.0:
+        tracer[last_reactor + 1] = 0.0
+    else:
+        tracer[last_reactor + 1] = (
+            (flow_feed + flow_ras_recycle - flow_waste)
+            / flow_ras_recycle
+            * tracer[last_reactor]
+        )
 
     return flow_waste, tracer
 
@@ -414,6 +417,8 @@ def wastage_and_flows(
             mass_tracer += tracer[k] * plant.Vol[k]
 
         # (f) Update wastage flow rate
+        if tracer[plant.LastReactor] == 0.0:
+            break
         plant.FlowWaste = (mass_tracer / plant.Rs) / tracer[plant.LastReactor]
 
         iteration += 1
@@ -481,10 +486,12 @@ def set_waste(
             no_waste_ints -= 1
             wastage_on[i] = False
 
-    # Distribute the average wastage across the active intervals.
-    # Pascal: FlowWaste[i] := FlowWasteAvg * 12 / NoWasteInts
-    # The factor 12 comes from NoDiurnalInts (the total number of intervals),
-    # so a full day's wastage is allocated to the subset of active intervals.
+    if no_waste_ints == 0:
+        raise ValueError(
+            "All diurnal intervals have flow at or below the wastage average — "
+            "zero active intervals for wastage distribution."
+        )
+
     for i in range(1, no_diurnal_ints + 1):
         if wastage_on[i]:
             flow_waste[i] = flow_waste_avg * no_diurnal_ints / no_waste_ints

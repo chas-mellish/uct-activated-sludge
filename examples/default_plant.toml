@@ -82,33 +82,38 @@ settled = false              # Whether settled-sewage fractionation is active
 [plant]
 LastReactor = 3               # Number of active reactors (1..12)
 Temp        = 20.0            # Operating temperature (degC)
-Rs          = 0.0             # Sludge retention time / SRT (days)
-VolType     = "ML"            # Volume unit label ("ML" or "m3")
+Rs          = 20.0            # Sludge retention time / SRT (days)
+VolType     = "ML"            # Volume unit label (must be "ML")
 
 # Reactor volumes (1-based: reactor 1, reactor 2, ... up to MaxReac=12)
-Vol = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Vol = [1.5, 3.0, 6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 # Fractional feed distribution to each reactor
-FracFeed = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+FracFeed = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 # Dissolved oxygen setpoint per reactor (g O2 m^-3)
-DOConc = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+DOConc = [0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 # Aeration flags per reactor (true = aerated)
-ReactorAerated = [true, true, true, true, true, true, true, true, true, true, true, true, true]
+ReactorAerated = [false, false, true, true, true, true, true, true, true, true, true, true, true]
 
 # Recycle source/destination reactor numbers
-ReactorAIn  = 0
-ReactorAOut = 0
+ReactorAIn  = 2
+ReactorAOut = 3
 ReactorBIn  = 0
 ReactorBOut = 0
 
-# Flow parameters (volumetric rates, same units as Vol per day)
-FlowFeed       = 0.0
-FlowRASrecycle = 0.0
-FlowArecycle   = 0.0
+# Flow parameters (ML/d)
+FlowFeed       = 25.0
+FlowRASrecycle = 25.0
+FlowArecycle   = 75.0
 FlowBrecycle   = 0.0
 FlowWaste      = 0.0
+
+# Recycle routing flags (1-based: 1 = connected to that reactor)
+FlagRASIn = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+FlagAIn   = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+FlagAOut  = [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 
 # ===================================================================

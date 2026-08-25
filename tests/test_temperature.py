@@ -1,7 +1,6 @@
 """Tests for the Arrhenius temperature correction module."""
 
 import numpy as np
-import pytest
 
 from uct_activated_sludge.models import KineticParams
 from uct_activated_sludge.temperature import adjust_temperature

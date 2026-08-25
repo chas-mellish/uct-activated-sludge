@@ -1,9 +1,8 @@
 """Tests for the flow division, wastage, and hydraulic calculations."""
 
 import numpy as np
-import pytest
 
-from uct_activated_sludge.constants import MAX_REAC_P1, TOTAL_COMPOUNDS
+from uct_activated_sludge.constants import MAX_REAC_P1, NO_DIURNAL_INTS, TOTAL_COMPOUNDS
 from uct_activated_sludge.hydraulics import (
     flow_division_dynamic,
     flow_division_ss,
@@ -127,8 +126,8 @@ class TestSetWaste:
 
     def test_all_flows_above_threshold(self):
         """When all dynamic flows exceed waste_avg, wastage is active everywhere."""
-        dynamic_flow = np.zeros(13, dtype=np.float64)
-        for i in range(1, 13):
+        dynamic_flow = np.zeros(NO_DIURNAL_INTS + 1, dtype=np.float64)
+        for i in range(1, NO_DIURNAL_INTS + 1):
             dynamic_flow[i] = 30.0  # all above waste_avg=10
 
         result = set_waste(
@@ -138,14 +137,14 @@ class TestSetWaste:
         )
         assert result["NoWasteInts"] == 12
         # Total daily wastage distributed evenly
-        for i in range(1, 13):
+        for i in range(1, NO_DIURNAL_INTS + 1):
             assert result["WastageOn"][i] is True or result["WastageOn"][i] == True
             np.testing.assert_allclose(result["FlowWaste"][i], 10.0)
 
     def test_some_flows_below_threshold(self):
         """When some flows are below waste_avg, wastage is only active in high-flow intervals."""
-        dynamic_flow = np.zeros(13, dtype=np.float64)
-        for i in range(1, 13):
+        dynamic_flow = np.zeros(NO_DIURNAL_INTS + 1, dtype=np.float64)
+        for i in range(1, NO_DIURNAL_INTS + 1):
             if i <= 4:
                 dynamic_flow[i] = 5.0   # below waste_avg
             else:
@@ -158,7 +157,7 @@ class TestSetWaste:
         )
         assert result["NoWasteInts"] == 8  # 8 intervals above threshold
         # Wastage in active intervals = avg * 12 / 8
-        for i in range(1, 13):
+        for i in range(1, NO_DIURNAL_INTS + 1):
             if i <= 4:
                 assert result["WastageOn"][i] == False
                 np.testing.assert_allclose(result["FlowWaste"][i], 0.0)
@@ -168,8 +167,8 @@ class TestSetWaste:
 
     def test_distributes_correctly(self):
         """Wastage should distribute average daily mass across active intervals."""
-        dynamic_flow = np.zeros(13, dtype=np.float64)
-        for i in range(1, 13):
+        dynamic_flow = np.zeros(NO_DIURNAL_INTS + 1, dtype=np.float64)
+        for i in range(1, NO_DIURNAL_INTS + 1):
             dynamic_flow[i] = 20.0  # all above threshold
         flow_waste_avg = 5.0
 
@@ -179,7 +178,7 @@ class TestSetWaste:
             flow_waste_avg=flow_waste_avg,
         )
         # With all 12 intervals active, each gets: 5.0 * 12 / 12 = 5.0
-        for i in range(1, 13):
+        for i in range(1, NO_DIURNAL_INTS + 1):
             np.testing.assert_allclose(result["FlowWaste"][i], 5.0)
 
 
