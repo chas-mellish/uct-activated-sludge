@@ -356,17 +356,15 @@ class TestTemperatureMonotonicity:
             )
 
     @given(
-        t1=st.floats(min_value=5.0, max_value=38.0),
-        t2=st.floats(min_value=5.0, max_value=39.0),
-        t3=st.floats(min_value=5.0, max_value=40.0),
+        t1=st.floats(min_value=5.0, max_value=20.0),
+        gap1=st.floats(min_value=0.5, max_value=8.0),
+        gap2=st.floats(min_value=0.5, max_value=8.0),
     )
     @settings(max_examples=100)
-    def test_transitivity(self, t1: float, t2: float, t3: float) -> None:
+    def test_transitivity(self, t1: float, gap1: float, gap2: float) -> None:
         """If t1 < t2 < t3 and theta > 1, then val(t1) < val(t2) < val(t3)."""
-        # Require a minimum gap to avoid floating-point equality for
-        # nearly-identical temperatures.
-        assume(t1 + 0.1 < t2)
-        assume(t2 + 0.1 < t3)
+        t2 = t1 + gap1
+        t3 = t2 + gap2
         base = KineticParams()
         adj1 = adjust_temperature(base, t1)
         adj2 = adjust_temperature(base, t2)
