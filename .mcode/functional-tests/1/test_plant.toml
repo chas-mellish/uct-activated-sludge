@@ -1,0 +1,86 @@
+# Functional test plant configuration
+# 3-reactor UCT plant: Anaerobic -> Anoxic -> Aerobic
+# Matches the conftest.py default_plant_config fixture
+
+[kinetics]
+  [kinetics.heterotrophs]
+  MuHatHetero20 = 3.2
+  Ks20 = 5.0
+  Bh20 = 0.62
+  Koh = 0.002
+  NetaGrow = 0.33
+  Kno = 0.10
+  Kmp20 = 1.35
+  Ksp20 = 0.027
+  Kr20 = 0.032
+  Kna = 0.01
+  Ka20 = 0.17
+
+  [kinetics.autotrophs]
+  MuHatAuto20 = 0.45
+  Knh20 = 1.0
+  Koa = 0.002
+  Ba20 = 0.04
+
+  [kinetics.arrhenius]
+  ThetaMuHatH = 1.200
+  ThetaKs = 1.000
+  ThetaBh = 1.029
+  ThetaKmp = 1.08
+  ThetaKsp = 0.910
+  ThetaKr = 1.029
+  ThetaKa = 1.029
+  ThetaMuHatA = 1.123
+  ThetaKnh = 1.123
+  ThetaBa = 1.029
+
+[stoichiometry]
+Yh = 0.666
+Fe = 0.08
+Ixb = 0.0676
+Ixe = 0.0676
+Ya = 0.15
+CODVSS = 1.48
+Fma = 1.00
+
+[wastewater]
+Sti = 500.0
+Nti = 50.0
+Fbs = 0.20
+Fus = 0.05
+Fup = 0.13
+Fnaa = 0.75
+Fnox = 0.50
+Fnu = 0.03
+Fxbh = 0.0
+VSSTSS = 0.75
+Alki = 10.0
+settled = false
+
+[plant]
+LastReactor = 3
+Temp = 20.0
+Rs = 20.0
+VolType = "ML"
+Vol = [1.5, 3.0, 6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+FracFeed = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+DOConc = [0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ReactorAerated = [false, false, true, true, true, true, true, true, true, true, true, true, true]
+ReactorAIn = 2
+ReactorAOut = 3
+ReactorBIn = 0
+ReactorBOut = 0
+VolumeTotal = 10.5
+FlowFeed = 25.0
+FlowRASrecycle = 25.0
+FlowArecycle = 75.0
+FlowBrecycle = 0.0
+FlowWaste = 0.0
+FlagRASIn = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+FlagAIn = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+FlagAOut = [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+[integration]
+Accuracy = 0.50
+Theta = 0.70
+DataIntHours = 0.25
