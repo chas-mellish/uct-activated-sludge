@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=68.0", "wheel"]
-build-backend = "setuptools.backends._legacy:_Backend"
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "uct-activated-sludge"
@@ -8,20 +8,19 @@ version = "0.1.0"
 description = "UCT Activated Sludge Model — Python modernization of legacy Pascal BNR simulation"
 requires-python = ">=3.10"
 dependencies = [
-    "numpy>=1.26.0",
-    "scipy>=1.12.0",
-    "pandas>=2.1.0",
+    "numpy>=1.26",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.4.0",
-    "pytest-cov>=4.1.0",
-    "matplotlib>=3.8.0",
+    "pytest>=8.0",
+    "pytest-cov",
+    "hypothesis",
+    "ruff",
 ]
 
 [project.scripts]
-uct-asp = "uct_activated_sludge.cli:main"
+uct-as = "uct_activated_sludge.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -29,3 +28,7 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
