@@ -35,7 +35,7 @@ uct-activated-sludge/ ├── .gitignore ├── README.md ├── legacy/
 
 | File | Purpose |
 |------|---------|
-| `UCTOLD.PAS` | Main program with compiler directives (`{$R-}`, `{$B+}`, `{$S+}`, `{$I+}`, `{$N-}`); no numeric coprocessor assumed |
+| `UCTOLD.PAS` | Main program with compiler directives; no numeric coprocessor assumed |
 
 #### Core Computational Modules
 
@@ -47,8 +47,8 @@ uct-activated-sludge/ ├── .gitignore ├── README.md ├── legacy/
 | `RATEUNIT.PAS` | `Unit RateUnit` | Rate calculation routines |
 | `INTEGRAT.PAS` | `Procedure Integrate` | Numerical integration (Dahlquist & Björck method) |
 | `NEWTON.PAS` | `Procedure Newton` | Newton-Raphson solver for system of equations |
-| `MACHEPS.MAS` | `Procedure CalcMachEps` | Machine epsilon calculation for numerical precision |
-| `ADJTEMP.PAS` | `Procedure TempAdjustment` | Temperature correction (Arrhenius); includes custom `Power(B,X)` function |
+| `MACHEPS.PAS` | `Procedure CalcMachEps` | Machine epsilon calculation for numerical precision |
+| `ADJTEMP.PAS` | `Procedure TempAdjustment` | Temperature correction (Arrhenius) |
 | `SCALE.PAS` | `Procedure ScaleValues` | Matrix scaling for numerical stability |
 | `FRACINF.PAS` | `Procedure FractionateInfluent` | Influent COD fractionation into ASM1 components |
 | `STRINGS.PAS` | `Procedure ComponentNames` | ASM1 component names (Xbh, Xe, Xba, etc.) |
@@ -88,7 +88,7 @@ uct-activated-sludge/ ├── .gitignore ├── README.md ├── legacy/
 
 | File | Declaration | Purpose |
 |------|-------------|---------|
-| `KINETIC.PAS` | `Procedure Heterotrophs` | Heterotroph kinetic constants (mu, Ks, etc.) |
+| `KINETIC.PAS` | `Procedure Heterotrophs` | Heterotroph kinetic constants |
 | `WATER.PAS` | `Procedure WasteWaterUpdate` | Wastewater composition parameters |
 | `CHANGE.PAS` | `Procedure ChangeParameter` | Interactive parameter modification |
 | `INTPARAM.PAS` | `Procedure CheckIntegParameters` | Integration accuracy and theta parameters |
@@ -137,15 +137,15 @@ uct-activated-sludge/ ├── .gitignore ├── README.md ├── legacy/
 
 1. **Global mutable state:** `VarsUnit` is the central hub — nearly all other units and procedures depend on it for shared variables. This mirrors the Pascal convention of the era and will need careful decomposition in Python.
 
-2. **Include-file pattern:** Many files are not Turbo Pascal `unit`s with `interface`/`implementation` sections, but rather bare procedure/procedure-group files likely `{$I}`-included by the main program (`UCTOLD.PAS`). This includes files like `ADJTEMP.PAS`, `BACKGRND.PAS`, `FLOWDI.PAS`, `INTEGRAT.PAS`, etc.
+2. **Include-file pattern:** Many files are not Turbo Pascal `unit`s with `interface`/`implementation` sections, but rather bare procedure files likely `{$I}`-included by the main program (`UCTOLD.PAS`).
 
 3. **Two standalone programs:** `RETRIEVE.PAS` and `PAGEUP.PAS` are standalone `Program` files, not included by the main program.
 
 4. **Borland-provided files:** `DRIVERS.PAS` and `FONTS.PAS` are Borland sample units for BGI graphics linking — these can be excluded from conversion.
 
-5. **Numerical methods:** The integration routine references Dahlquist & Björck (numerical methods textbook), suggesting a Runge-Kutta or similar ODE solver. The `Newton` procedure handles nonlinear system solving.
+5. **Numerical methods:** The integration routine references Dahlquist & Björck, suggesting a Runge-Kutta or similar ODE solver. The `Newton` procedure handles nonlinear system solving.
 
-6. **ASM1 compliance:** `STRINGS.PAS` confirms ASM1 component naming (Xbh = heterotrophic biomass, Xe = endogenous residue, Xba = autotrophic biomass), confirming this is an ASM1-family implementation.
+6. **ASM1 compliance:** `STRINGS.PAS` confirms ASM1 component naming (Xbh = heterotrophic biomass, Xe = endogenous residue, Xba = autotrophic biomass).
 
 7. **Dual simulation modes:** The codebase clearly separates steady-state (`STDY*` files) and dynamic/diurnal (`DI*` files) simulation paths.
 
@@ -176,4 +176,3 @@ src/uct_activated_sludge/ ├── init.py # Package exports ├── models.p
 
 Original UCT Activated Sludge Model code developed by Prof. George Ekama and colleagues at UCT.
 Available for educational and research purposes.
-EOF
