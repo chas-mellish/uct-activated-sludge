@@ -412,10 +412,18 @@ class IntegrationParams:
     # but are declared here so callers can inspect / override them.
     MaxDeltaTLarge: float = 0.0
     MaxDeltaTSmall: float = 0.0
+    MinDeltaTLarge: float = 0.0
+    MinDeltaTSmall: float = 0.0
     DeltaTlarge: float = 0.0
     DeltaTsmall: float = 0.0
     IntegIntDays: float = 0.0
     IntegTime: float = 0.0
+
+    # State variables preserved across integration calls (from DIUNIT.PAS)
+    PrevDeltaTLarge: float = 0.0
+    PrevDeltaTSmall: float = 0.0
+    TruncatedLarge: bool = False
+    TruncatedSmall: bool = False
 
 
 # ===================================================================
