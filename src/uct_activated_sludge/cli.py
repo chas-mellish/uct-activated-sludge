@@ -184,7 +184,7 @@ def _run_diurnal_cmd(args: argparse.Namespace) -> int:
             print(f"Results written to {args.output}")
 
         return 0
-    except (ValueError, FileNotFoundError) as exc:
+    except (ValueError, FileNotFoundError, KeyError, TypeError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
 
