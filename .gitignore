@@ -33,6 +33,7 @@ venv/
 .pytest_cache/
 .coverage
 htmlcov/
+.hypothesis/
 
 # Linting
 .ruff_cache/
