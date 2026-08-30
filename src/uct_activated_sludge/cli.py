@@ -22,7 +22,7 @@ class _NumpyEncoder(json.JSONEncoder):
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="uct-as",
+        prog="uct-asp",
         description="UCT Activated Sludge Model — ASM1/BNR simulation engine",
     )
     parser.add_argument(
@@ -119,7 +119,7 @@ def _run_steady_state_cmd(args: argparse.Namespace) -> int:
             print(f"Results written to {args.output}")
 
         return 0
-    except Exception as exc:
+    except (ValueError, FileNotFoundError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
 
@@ -184,7 +184,7 @@ def _run_diurnal_cmd(args: argparse.Namespace) -> int:
             print(f"Results written to {args.output}")
 
         return 0
-    except Exception as exc:
+    except (ValueError, FileNotFoundError, KeyError, TypeError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
 
