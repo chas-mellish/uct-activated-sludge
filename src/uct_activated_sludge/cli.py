@@ -22,7 +22,7 @@ class _NumpyEncoder(json.JSONEncoder):
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="uct-as",
+        prog="uct-asp",
         description="UCT Activated Sludge Model — ASM1/BNR simulation engine",
     )
     parser.add_argument(
@@ -63,7 +63,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "params", help="Display parameter sets"
     )
     params_parser.add_argument(
-        "--list",
+        "--group",
         type=str,
         choices=["kinetics", "stoichiometry", "wastewater", "plant", "integration"],
         default=None,
@@ -119,7 +119,7 @@ def _run_steady_state_cmd(args: argparse.Namespace) -> int:
             print(f"Results written to {args.output}")
 
         return 0
-    except Exception as exc:
+    except (ValueError, FileNotFoundError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
 
@@ -184,7 +184,7 @@ def _run_diurnal_cmd(args: argparse.Namespace) -> int:
             print(f"Results written to {args.output}")
 
         return 0
-    except Exception as exc:
+    except (ValueError, FileNotFoundError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
 
@@ -201,9 +201,9 @@ def _run_params_cmd(args: argparse.Namespace) -> int:
         WastewaterParams,
     )
 
-    group = args.list
+    group = args.group
     if group is None:
-        print("Please specify a parameter group with --list.")
+        print("Please specify a parameter group with --group.")
         print("Choices: kinetics, stoichiometry, wastewater, plant, integration")
         return 1
 
