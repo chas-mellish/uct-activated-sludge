@@ -63,7 +63,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "params", help="Display parameter sets"
     )
     params_parser.add_argument(
-        "--group",
+        "--list",
         type=str,
         choices=["kinetics", "stoichiometry", "wastewater", "plant", "integration"],
         default=None,
@@ -201,9 +201,9 @@ def _run_params_cmd(args: argparse.Namespace) -> int:
         WastewaterParams,
     )
 
-    group = args.group
+    group = args.list
     if group is None:
-        print("Please specify a parameter group with --group.")
+        print("Please specify a parameter group with --list.")
         print("Choices: kinetics, stoichiometry, wastewater, plant, integration")
         return 1
 

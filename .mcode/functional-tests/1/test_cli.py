@@ -96,18 +96,18 @@ class TestVersionOutput:
 
 
 class TestParamsKinetics:
-    """uct-asp params --group kinetics -- display kinetic parameter defaults."""
+    """uct-asp params --list kinetics -- display kinetic parameter defaults."""
 
     def test_params_kinetics_exits_zero(self):
-        result = run_cli("params", "--group", "kinetics")
+        result = run_cli("params", "--list", "kinetics")
         assert result.returncode == 0
 
     def test_params_kinetics_shows_header(self):
-        result = run_cli("params", "--group", "kinetics")
+        result = run_cli("params", "--list", "kinetics")
         assert "KineticParams" in result.stdout
 
     def test_params_kinetics_shows_key_params(self):
-        result = run_cli("params", "--group", "kinetics")
+        result = run_cli("params", "--list", "kinetics")
         assert "MuHatHetero20" in result.stdout
         assert "3.2" in result.stdout
         assert "Ks20" in result.stdout
@@ -116,18 +116,18 @@ class TestParamsKinetics:
 
 
 class TestParamsStoichiometry:
-    """uct-asp params --group stoichiometry -- display stoichiometric defaults."""
+    """uct-asp params --list stoichiometry -- display stoichiometric defaults."""
 
     def test_params_stoichiometry_exits_zero(self):
-        result = run_cli("params", "--group", "stoichiometry")
+        result = run_cli("params", "--list", "stoichiometry")
         assert result.returncode == 0
 
     def test_params_stoichiometry_shows_header(self):
-        result = run_cli("params", "--group", "stoichiometry")
+        result = run_cli("params", "--list", "stoichiometry")
         assert "StoichiometricParams" in result.stdout
 
     def test_params_stoichiometry_shows_key_params(self):
-        result = run_cli("params", "--group", "stoichiometry")
+        result = run_cli("params", "--list", "stoichiometry")
         assert "Yh" in result.stdout
         assert "0.666" in result.stdout
         assert "Ya" in result.stdout
@@ -135,48 +135,48 @@ class TestParamsStoichiometry:
 
 
 class TestParamsWastewater:
-    """uct-asp params --group wastewater -- display wastewater defaults."""
+    """uct-asp params --list wastewater -- display wastewater defaults."""
 
     def test_params_wastewater_exits_zero(self):
-        result = run_cli("params", "--group", "wastewater")
+        result = run_cli("params", "--list", "wastewater")
         assert result.returncode == 0
 
     def test_params_wastewater_shows_key_params(self):
-        result = run_cli("params", "--group", "wastewater")
+        result = run_cli("params", "--list", "wastewater")
         assert "Sti" in result.stdout
         assert "500" in result.stdout
         assert "Nti" in result.stdout
 
 
 class TestParamsPlant:
-    """uct-asp params --group plant -- display plant config defaults."""
+    """uct-asp params --list plant -- display plant config defaults."""
 
     def test_params_plant_exits_zero(self):
-        result = run_cli("params", "--group", "plant")
+        result = run_cli("params", "--list", "plant")
         assert result.returncode == 0
 
     def test_params_plant_shows_key_fields(self):
-        result = run_cli("params", "--group", "plant")
+        result = run_cli("params", "--list", "plant")
         assert "PlantConfig" in result.stdout
         assert "LastReactor" in result.stdout
         assert "FlowFeed" in result.stdout
 
 
 class TestParamsIntegration:
-    """uct-asp params --group integration -- display integration defaults."""
+    """uct-asp params --list integration -- display integration defaults."""
 
     def test_params_integration_exits_zero(self):
-        result = run_cli("params", "--group", "integration")
+        result = run_cli("params", "--list", "integration")
         assert result.returncode == 0
 
     def test_params_integration_shows_key_fields(self):
-        result = run_cli("params", "--group", "integration")
+        result = run_cli("params", "--list", "integration")
         assert "IntegrationParams" in result.stdout
         assert "Accuracy" in result.stdout
 
 
 class TestParamsNoGroup:
-    """uct-asp params without --group -- should print guidance and exit 1."""
+    """uct-asp params without --list -- should print guidance and exit 1."""
 
     def test_params_no_group_exits_nonzero(self):
         result = run_cli("params")
@@ -184,14 +184,14 @@ class TestParamsNoGroup:
 
     def test_params_no_group_shows_guidance(self):
         result = run_cli("params")
-        assert "--group" in result.stdout
+        assert "--list" in result.stdout
 
 
 class TestParamsInvalidGroup:
-    """uct-asp params --group invalid -- argparse rejects it with exit 2."""
+    """uct-asp params --list invalid -- argparse rejects it with exit 2."""
 
     def test_params_invalid_group_exits_nonzero(self):
-        result = run_cli("params", "--group", "nonexistent")
+        result = run_cli("params", "--list", "nonexistent")
         assert result.returncode != 0
 
 
