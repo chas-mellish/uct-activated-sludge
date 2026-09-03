@@ -25,19 +25,13 @@ class TestCLIHelpText:
         assert "diurnal" in captured.out
         assert "params" in captured.out
 
-    def test_steady_state_flags(self):
-        from uct_activated_sludge.cli import _build_parser
-
-        parser = _build_parser()
-        args = parser.parse_args(["steady-state", "--config", "test.toml", "--output", "out.json"])
+    def test_steady_state_flags(self, cli_parser):
+        args = cli_parser.parse_args(["steady-state", "--config", "test.toml", "--output", "out.json"])
         assert args.config == "test.toml"
         assert args.output == "out.json"
 
-    def test_diurnal_flags(self):
-        from uct_activated_sludge.cli import _build_parser
-
-        parser = _build_parser()
-        args = parser.parse_args([
+    def test_diurnal_flags(self, cli_parser):
+        args = cli_parser.parse_args([
             "diurnal", "--config", "test.toml",
             "--output", "out.json",
             "--diurnal-data", "data.csv",
@@ -46,31 +40,22 @@ class TestCLIHelpText:
         assert args.output == "out.json"
         assert args.diurnal_data == "data.csv"
 
-    def test_params_list_choices(self):
-        from uct_activated_sludge.cli import _build_parser
-
-        parser = _build_parser()
+    def test_params_list_choices(self, cli_parser):
         for group in ["kinetics", "stoichiometry", "wastewater", "plant", "integration"]:
-            args = parser.parse_args(["params", "--list", group])
+            args = cli_parser.parse_args(["params", "--list", group])
             assert args.list == group
 
-    def test_version_flag(self):
-        from uct_activated_sludge.cli import _build_parser
-
-        parser = _build_parser()
+    def test_version_flag(self, cli_parser):
         with pytest.raises(SystemExit) as exc_info:
-            parser.parse_args(["--version"])
+            cli_parser.parse_args(["--version"])
         assert exc_info.value.code == 0
 
 
 class TestExampleTOMLFiles:
     """Verify example TOML configuration files parse without error."""
 
-    def test_default_plant_toml_loads(self):
-        from uct_activated_sludge.config import load_config, build_params_from_config
-
-        config = load_config(str(_EXAMPLES_DIR / "default_plant.toml"))
-        kp, sp, wp, pc, ip = build_params_from_config(config)
+    def test_default_plant_toml_loads(self, default_plant_params):
+        kp, sp, wp, pc, ip = default_plant_params
         assert pc.LastReactor == 3
         assert pc.Rs == 20.0
         assert wp.Sti == 500.0
@@ -85,38 +70,26 @@ class TestExampleTOMLFiles:
         assert wp.Fup == 0.04
         assert wp.Fus == 0.08
 
-    def test_default_plant_has_all_sections(self):
-        from uct_activated_sludge.config import load_config
-
-        config = load_config(str(_EXAMPLES_DIR / "default_plant.toml"))
+    def test_default_plant_has_all_sections(self, default_plant_toml_config):
         for section in ["kinetics", "stoichiometry", "wastewater", "plant", "integration"]:
-            assert section in config, f"Missing section: {section}"
+            assert section in default_plant_toml_config, f"Missing section: {section}"
 
 
 class TestExampleCSVFile:
     """Verify the example diurnal CSV file loads without error."""
 
-    def test_diurnal_pattern_csv_loads(self):
-        from uct_activated_sludge.config import load_diurnal_data
+    def test_diurnal_pattern_csv_loads(self, diurnal_pattern_data):
+        assert len(diurnal_pattern_data) == 12
 
-        data = load_diurnal_data(str(_EXAMPLES_DIR / "diurnal_pattern.csv"))
-        assert len(data) == 12
-
-    def test_diurnal_pattern_csv_has_required_keys(self):
-        from uct_activated_sludge.config import load_diurnal_data
-
-        data = load_diurnal_data(str(_EXAMPLES_DIR / "diurnal_pattern.csv"))
-        for record in data:
+    def test_diurnal_pattern_csv_has_required_keys(self, diurnal_pattern_data):
+        for record in diurnal_pattern_data:
             assert "Time" in record
             assert "Flow" in record
             assert "COD" in record
             assert "TKN" in record
 
-    def test_diurnal_pattern_csv_values_positive(self):
-        from uct_activated_sludge.config import load_diurnal_data
-
-        data = load_diurnal_data(str(_EXAMPLES_DIR / "diurnal_pattern.csv"))
-        for record in data:
+    def test_diurnal_pattern_csv_values_positive(self, diurnal_pattern_data):
+        for record in diurnal_pattern_data:
             assert record["Flow"] > 0
             assert record["COD"] > 0
             assert record["TKN"] > 0
@@ -175,28 +148,40 @@ class TestPythonAPISnippets:
         assert sp.Ya == 0.15
         assert wp.Sti == 500.0
 
-    def test_build_params_from_toml(self):
-        from uct_activated_sludge.config import load_config, build_params_from_config
-
-        config = load_config(str(_EXAMPLES_DIR / "default_plant.toml"))
-        kp, sp, wp, pc, ip = build_params_from_config(config)
+    def test_build_params_from_toml(self, default_plant_params):
+        kp, sp, wp, pc, ip = default_plant_params
         assert pc.FlowFeed == 25.0
         assert pc.VolumeTotal == 10.5
 
-    def test_inspect_params_with_dataclass_fields(self):
+    def test_inspect_params_with_dataclass_fields(self, default_kinetic_params):
         from dataclasses import fields
-        from uct_activated_sludge.models import KineticParams
 
-        kp = KineticParams()
-        field_names = [f.name for f in fields(kp)]
+        field_names = [f.name for f in fields(default_kinetic_params)]
         assert "MuHatHetero20" in field_names
         assert "Ks20" in field_names
 
-    def test_stoichiometric_matrix_construction(self):
-        from uct_activated_sludge.models import StoichiometricParams
+    def test_stoichiometric_matrix_construction(self, default_stoich_params):
         from uct_activated_sludge.stoichiometry import build_stoichiometric_matrix
 
-        sp = StoichiometricParams()
-        matrix = build_stoichiometric_matrix(sp)
+        matrix = build_stoichiometric_matrix(default_stoich_params)
         assert matrix.shape[0] > 0
         assert matrix.shape[1] > 0
+
+    def test_steady_state_snippet_executes(self, default_plant_params):
+        from uct_activated_sludge.steady_state import run_steady_state
+
+        kp, sp, wp, pc, ip = default_plant_params
+        result = run_steady_state(pc, kp, sp, wp, integration_params=ip)
+        assert isinstance(result["output"], str)
+        assert result["converged"] is True
+        assert result["C"][1, 1] >= 0.0
+        assert result["FlowWaste"] > 0.0
+
+    def test_diurnal_snippet_executes(self, default_plant_params, diurnal_pattern_data):
+        from uct_activated_sludge.diurnal import run_diurnal
+
+        kp, sp, wp, pc, ip = default_plant_params
+        di = run_diurnal(pc, kp, sp, wp, diurnal_pattern_data, integration_params=ip, max_cycles=5)
+        assert isinstance(di["converged"], bool)
+        assert di["cycle_count"] >= 1
+        assert di["data_per_day"] > 0
