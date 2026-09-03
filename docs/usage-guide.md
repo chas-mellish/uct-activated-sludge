@@ -289,6 +289,8 @@ All arrays are 1-indexed TOML lists with up to 13 entries (positions 1–12 corr
 | `FlagRASIn` | int[] | RAS recycle routing flags (1 = connected to that reactor) |
 | `FlagAIn` | int[] | A-recycle inflow routing flags |
 | `FlagAOut` | int[] | A-recycle outflow routing flags |
+| `FlagBIn` | int[] | B-recycle inflow routing flags |
+| `FlagBOut` | int[] | B-recycle outflow routing flags |
 
 Example for a 3-reactor UCT process (anaerobic → anoxic → aerobic):
 
