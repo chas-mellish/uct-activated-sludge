@@ -179,9 +179,11 @@ class TestPythonAPISnippets:
 
     def test_diurnal_snippet_executes(self, default_plant_params, diurnal_pattern_data):
         from uct_activated_sludge.diurnal import run_diurnal
+        from uct_activated_sludge.steady_state import run_steady_state
 
         kp, sp, wp, pc, ip = default_plant_params
-        di = run_diurnal(pc, kp, sp, wp, diurnal_pattern_data, integration_params=ip, max_cycles=5)
+        ss = run_steady_state(pc, kp, sp, wp, integration_params=ip)
+        di = run_diurnal(pc, kp, sp, wp, ip, ss["C"], diurnal_pattern_data, max_cycles=5)
         assert isinstance(di["converged"], bool)
         assert di["cycle_count"] >= 1
         assert di["data_per_day"] > 0
