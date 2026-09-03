@@ -114,7 +114,7 @@ Prints a table showing each field name, its type, and the default value for the 
 
 ## Configuration File Format (TOML)
 
-Plant configurations are specified in TOML files with five sections. All keys are optional — omitted keys use the built-in defaults from the Python dataclasses. See `examples/default_plant.toml` for a complete annotated example.
+Plant configurations are specified in TOML files with five sections. All keys are optional — the Default values shown in the tables below are the recommended operational defaults from `examples/default_plant.toml` (based on the Pascal original). Omitted keys fall back to the raw Python dataclass defaults, which are 0 / 0.0 for numeric fields and are not suitable for running a simulation without further configuration. See `examples/default_plant.toml` for a complete annotated example.
 
 ### kinetics
 
