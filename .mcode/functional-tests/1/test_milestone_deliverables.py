@@ -13,19 +13,7 @@ import csv
 import os
 import subprocess
 
-WORKSPACE_DIR = os.environ.get(
-    "WORKSPACE_DIR",
-    os.path.dirname(
-        os.path.dirname(
-            os.path.dirname(
-                os.path.dirname(
-                    os.path.dirname(os.path.abspath(__file__))
-                )
-            )
-        )
-    ),
-)
-REPO_DIR = os.path.join(WORKSPACE_DIR, "uct-activated-sludge")
+from conftest import REPO_DIR
 
 
 class TestDeliverableFilesExist:
