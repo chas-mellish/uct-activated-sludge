@@ -2,6 +2,7 @@
 
 import json
 import os
+import shutil
 import subprocess
 
 import pytest
@@ -14,15 +15,17 @@ REPO_DIR = os.path.join(WORKSPACE_DIR, "uct-activated-sludge")
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 TEST_CONFIG = os.path.join(TEST_DIR, "test_plant.toml")
 EXAMPLES_CONFIG = os.path.join(REPO_DIR, "examples", "default_plant.toml")
-VENV_ACTIVATE = os.path.join(REPO_DIR, ".venv", "bin", "activate")
+
+# Locate the uct-asp executable: check .venv first, then PATH
+_VENV_BIN = os.path.join(REPO_DIR, ".venv", "bin", "uct-asp")
+CLI_EXE = _VENV_BIN if os.path.isfile(_VENV_BIN) else shutil.which("uct-asp") or "uct-asp"
 
 
 def run_cli(*args, input_text=None, timeout=60):
     """Invoke the uct-asp CLI and capture output."""
-    cmd = f". {VENV_ACTIVATE} && uct-asp {' '.join(args)}"
+    cmd = [CLI_EXE] + list(args)
     return subprocess.run(
         cmd,
-        shell=True,
         cwd=REPO_DIR,
         capture_output=True,
         text=True,
