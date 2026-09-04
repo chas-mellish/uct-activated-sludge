@@ -63,39 +63,26 @@ class TestDeliverableFilesExist:
 class TestDiurnalPatternCSV:
     """Verify examples/diurnal_pattern.csv is loadable by the application."""
 
-    def test_csv_loads_via_app_api(self):
+    def test_csv_loads_via_app_api(self, diurnal_data):
         """Load the CSV using the application's own load_diurnal_data function."""
-        from uct_activated_sludge.config import load_diurnal_data
+        assert len(diurnal_data) == 12, f"Expected 12 records, got {len(diurnal_data)}"
 
-        csv_path = os.path.join(REPO_DIR, "examples", "diurnal_pattern.csv")
-        data = load_diurnal_data(csv_path)
-        assert len(data) == 12, f"Expected 12 records, got {len(data)}"
-
-    def test_csv_records_have_required_keys(self):
-        from uct_activated_sludge.config import load_diurnal_data
-
-        csv_path = os.path.join(REPO_DIR, "examples", "diurnal_pattern.csv")
-        data = load_diurnal_data(csv_path)
-        for record in data:
+    def test_csv_records_have_required_keys(self, diurnal_data):
+        for record in diurnal_data:
             assert "Time" in record, "Missing 'Time' key"
             assert "Flow" in record, "Missing 'Flow' key"
             assert "COD" in record, "Missing 'COD' key"
             assert "TKN" in record, "Missing 'TKN' key"
 
-    def test_csv_values_positive(self):
-        from uct_activated_sludge.config import load_diurnal_data
-
-        csv_path = os.path.join(REPO_DIR, "examples", "diurnal_pattern.csv")
-        data = load_diurnal_data(csv_path)
-        for record in data:
+    def test_csv_values_positive(self, diurnal_data):
+        for record in diurnal_data:
             assert record["Flow"] > 0, f"Flow must be positive, got {record['Flow']}"
             assert record["COD"] > 0, f"COD must be positive, got {record['COD']}"
             assert record["TKN"] > 0, f"TKN must be positive, got {record['TKN']}"
 
-    def test_csv_raw_parse(self):
+    def test_csv_raw_parse(self, diurnal_csv_path):
         """Verify the CSV can be parsed with stdlib csv module too."""
-        csv_path = os.path.join(REPO_DIR, "examples", "diurnal_pattern.csv")
-        with open(csv_path) as f:
+        with open(diurnal_csv_path) as f:
             reader = csv.DictReader(f)
             rows = list(reader)
         assert len(rows) == 12
