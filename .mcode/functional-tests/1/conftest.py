@@ -4,6 +4,8 @@ import json
 import os
 import subprocess
 
+from uct_activated_sludge.config import load_diurnal_data
+
 import pytest
 
 WORKSPACE_DIR = os.environ.get(
@@ -14,15 +16,15 @@ REPO_DIR = os.path.join(WORKSPACE_DIR, "uct-activated-sludge")
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 TEST_CONFIG = os.path.join(TEST_DIR, "test_plant.toml")
 EXAMPLES_CONFIG = os.path.join(REPO_DIR, "examples", "default_plant.toml")
-VENV_ACTIVATE = os.path.join(REPO_DIR, ".venv", "bin", "activate")
+
+CLI_EXE = os.path.join(REPO_DIR, ".venv", "bin", "uct-asp")
 
 
 def run_cli(*args, input_text=None, timeout=60):
     """Invoke the uct-asp CLI and capture output."""
-    cmd = f". {VENV_ACTIVATE} && uct-asp {' '.join(args)}"
+    cmd = [CLI_EXE] + list(args)
     return subprocess.run(
         cmd,
-        shell=True,
         cwd=REPO_DIR,
         capture_output=True,
         text=True,
@@ -119,3 +121,26 @@ def cli_steady_state_help():
 @pytest.fixture(scope="session")
 def cli_diurnal_help():
     return run_cli("diurnal", "--help")
+
+
+@pytest.fixture(scope="session")
+def diurnal_csv_path():
+    return os.path.join(REPO_DIR, "examples", "diurnal_pattern.csv")
+
+
+@pytest.fixture(scope="session")
+def diurnal_data(diurnal_csv_path):
+    return load_diurnal_data(diurnal_csv_path)
+
+
+@pytest.fixture(scope="session")
+def settled_sewage_toml_config():
+    from uct_activated_sludge.config import load_config
+    config_path = os.path.join(REPO_DIR, "examples", "settled_sewage.toml")
+    return load_config(config_path)
+
+
+@pytest.fixture(scope="session")
+def settled_sewage_params(settled_sewage_toml_config):
+    from uct_activated_sludge.config import build_params_from_config
+    return build_params_from_config(settled_sewage_toml_config)

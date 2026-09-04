@@ -94,6 +94,13 @@ class TestExampleCSVFile:
             assert record["COD"] > 0
             assert record["TKN"] > 0
 
+    def test_diurnal_pattern_average_flow(self, diurnal_pattern_data):
+        flows = [record["Flow"] for record in diurnal_pattern_data]
+        assert len(flows) == 12
+        assert abs(sum(flows) / len(flows) - 25.0) < 0.01, (
+            f"Average flow is {sum(flows)/len(flows):.1f}, expected 25.0 ML/d"
+        )
+
 
 class TestPythonAPIImports:
     """Verify that documented Python API imports work."""
