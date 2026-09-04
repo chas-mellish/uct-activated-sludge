@@ -92,33 +92,22 @@ class TestDiurnalPatternCSV:
 class TestSettledSewageToml:
     """Verify examples/settled_sewage.toml is loadable and drives a simulation."""
 
-    def test_settled_sewage_config_loads(self):
-        from uct_activated_sludge.config import load_config, build_params_from_config
-
-        config_path = os.path.join(REPO_DIR, "examples", "settled_sewage.toml")
-        config = load_config(config_path)
-        kp, sp, wp, pc, ip = build_params_from_config(config)
+    def test_settled_sewage_config_loads(self, settled_sewage_params):
+        kp, sp, wp, pc, ip = settled_sewage_params
         assert wp.settled is True
         assert wp.Fbs == 0.25
         assert wp.Fup == 0.04
         assert wp.Fus == 0.08
 
-    def test_settled_sewage_has_all_sections(self):
-        from uct_activated_sludge.config import load_config
-
-        config_path = os.path.join(REPO_DIR, "examples", "settled_sewage.toml")
-        config = load_config(config_path)
+    def test_settled_sewage_has_all_sections(self, settled_sewage_toml_config):
         for section in ["kinetics", "stoichiometry", "wastewater", "plant", "integration"]:
-            assert section in config, f"Missing section: {section}"
+            assert section in settled_sewage_toml_config, f"Missing section: {section}"
 
-    def test_settled_sewage_steady_state_simulation(self):
+    def test_settled_sewage_steady_state_simulation(self, settled_sewage_params):
         """Verify the settled_sewage config can drive a complete simulation."""
-        from uct_activated_sludge.config import load_config, build_params_from_config
         from uct_activated_sludge.steady_state import run_steady_state
 
-        config_path = os.path.join(REPO_DIR, "examples", "settled_sewage.toml")
-        config = load_config(config_path)
-        kp, sp, wp, pc, ip = build_params_from_config(config)
+        kp, sp, wp, pc, ip = settled_sewage_params
         result = run_steady_state(pc, kp, sp, wp, integration_params=ip)
         assert result["converged"] is True, "Simulation did not converge"
         assert result["FlowWaste"] > 0.0
