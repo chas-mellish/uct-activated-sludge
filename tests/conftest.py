@@ -1,7 +1,15 @@
 """Shared fixtures for the UCT Activated Sludge Model test suite."""
 
+from pathlib import Path
+
 import pytest
 
+from uct_activated_sludge.config import (
+    build_params_from_config,
+    load_config,
+    load_diurnal_data,
+)
+from uct_activated_sludge.cli import _build_parser
 from uct_activated_sludge.models import (
     KineticParams,
     PlantConfig,
@@ -9,6 +17,8 @@ from uct_activated_sludge.models import (
     WastewaterParams,
 )
 from uct_activated_sludge.stoichiometry import build_stoichiometric_matrix
+
+_EXAMPLES_DIR = Path(__file__).resolve().parent.parent / "examples"
 
 
 @pytest.fixture
@@ -86,3 +96,27 @@ def default_plant_config():
 def default_stoich_matrix(default_stoich_params):
     """Build the stoichiometric matrix from default parameters."""
     return build_stoichiometric_matrix(default_stoich_params)
+
+
+@pytest.fixture
+def cli_parser():
+    """Build the CLI argument parser."""
+    return _build_parser()
+
+
+@pytest.fixture
+def diurnal_pattern_data():
+    """Load the example diurnal CSV pattern."""
+    return load_diurnal_data(str(_EXAMPLES_DIR / "diurnal_pattern.csv"))
+
+
+@pytest.fixture
+def default_plant_toml_config():
+    """Load the default_plant.toml example as a raw config dict."""
+    return load_config(str(_EXAMPLES_DIR / "default_plant.toml"))
+
+
+@pytest.fixture
+def default_plant_params(default_plant_toml_config):
+    """Build parameter objects from the default_plant.toml config."""
+    return build_params_from_config(default_plant_toml_config)
